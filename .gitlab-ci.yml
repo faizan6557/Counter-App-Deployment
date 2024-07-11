@@ -1,5 +1,6 @@
 stages:
   - build
+  - terraform
   - deploy
 
 variables:
@@ -17,6 +18,22 @@ build:
   script:
     - docker build -t $DOCKER_IMAGE .
     - docker push $DOCKER_IMAGE
+  only:
+    - master
+
+terraform:
+  stage: terraform
+  image: hashicorp/terraform:latest
+  script:
+    # Configure AWS CLI
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+    - aws configure set default.region $AWS_REGION
+
+    # Initialize and apply Terraform configuration
+    - cd terraform
+    - terraform init
+    - terraform apply -auto-approve
   only:
     - master
 

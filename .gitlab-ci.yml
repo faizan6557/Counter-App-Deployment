@@ -4,8 +4,9 @@ stages:
 
 variables:
   DOCKER_IMAGE: your-dockerhub-username/counter-app:latest
+  CLUSTER_NAME: your-cluster-name
+  AWS_REGION: your-aws-region
 
-# Docker build and push job
 build:
   stage: build
   image: docker:latest
@@ -19,19 +20,22 @@ build:
   only:
     - master
 
-# Kubernetes deploy job
 deploy:
   stage: deploy
-  image: bitnami/kubectl:latest
+  image: amazon/aws-cli:latest
   script:
-    - kubectl config set-cluster k8s-cluster --server=$K8S_SERVER
-    - kubectl config set-credentials k8s-admin --token=$K8S_TOKEN
-    - kubectl config set-context default --cluster=k8s-cluster --user=k8s-admin
-    - kubectl config use-context default
+    # Configure AWS CLI
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+    - aws configure set default.region $AWS_REGION
+    
+    # Update kubeconfig
+    - aws eks --region $AWS_REGION update-kubeconfig --name $CLUSTER_NAME
+    
+    # Deploy to EKS
     - kubectl apply -f namespace.yaml
     - kubectl apply -f deployment.yaml
     - kubectl apply -f service.yaml
     - kubectl apply -f replicaset.yaml
   only:
     - master
-

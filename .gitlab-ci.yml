@@ -1,0 +1,37 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  DOCKER_IMAGE: your-dockerhub-username/counter-app:latest
+
+# Docker build and push job
+build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+  script:
+    - docker build -t $DOCKER_IMAGE .
+    - docker push $DOCKER_IMAGE
+  only:
+    - master
+
+# Kubernetes deploy job
+deploy:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl config set-cluster k8s-cluster --server=$K8S_SERVER
+    - kubectl config set-credentials k8s-admin --token=$K8S_TOKEN
+    - kubectl config set-context default --cluster=k8s-cluster --user=k8s-admin
+    - kubectl config use-context default
+    - kubectl apply -f namespace.yaml
+    - kubectl apply -f deployment.yaml
+    - kubectl apply -f service.yaml
+    - kubectl apply -f replicaset.yaml
+  only:
+    - master
+

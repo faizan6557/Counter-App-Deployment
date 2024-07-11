@@ -19,7 +19,7 @@ build:
     - docker build -t $DOCKER_IMAGE .
     - docker push $DOCKER_IMAGE
   only:
-    - master
+    - dev
 
 terraform:
   stage: terraform
@@ -35,7 +35,7 @@ terraform:
     - terraform init
     - terraform apply -auto-approve
   only:
-    - master
+    - dev
 
 deploy:
   stage: deploy
@@ -55,4 +55,4 @@ deploy:
     - kubectl apply -f kubernetes/service.yaml
     - kubectl apply -f kubernetes/replicaset.yaml
   only:
-    - DEV
+    - dev

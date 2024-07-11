@@ -38,4 +38,4 @@ deploy:
     - kubectl apply -f kubernetes/service.yaml
     - kubectl apply -f kubernetes/replicaset.yaml
   only:
-    - master
+    - dev

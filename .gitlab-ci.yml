@@ -33,9 +33,9 @@ deploy:
     - aws eks --region $AWS_REGION update-kubeconfig --name $CLUSTER_NAME
     
     # Deploy to EKS
-    - kubectl apply -f namespace.yaml
-    - kubectl apply -f deployment.yaml
-    - kubectl apply -f service.yaml
-    - kubectl apply -f replicaset.yaml
+    - kubectl apply -f kubernetes/namespace.yaml
+    - kubectl apply -f kubernetes/deployment.yaml
+    - kubectl apply -f kubernetes/service.yaml
+    - kubectl apply -f kubernetes/replicaset.yaml
   only:
     - master
